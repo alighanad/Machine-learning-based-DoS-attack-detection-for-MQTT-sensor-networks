@@ -1,0 +1,3 @@
+[submodule "Ikea"]
+	path = Ikea
+	url = https://github.com/alighanad/IoTProject.git
