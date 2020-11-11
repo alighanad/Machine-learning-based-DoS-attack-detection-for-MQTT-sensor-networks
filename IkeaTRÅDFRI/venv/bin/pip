@@ -1,5 +1,5 @@
 #!/bin/sh
-'''exec' "/Users/alighannadrad/Documents/Semester 5/Thesis/Implementation/IkeaTRÅDFRI/venv/bin/python" "$0" "$@"
+'''exec' "/Users/alighannadrad/Documents/Semester 5/Thesis/Implementation/bulbb/venv/bin/python" "$0" "$@"
 ' '''
 # -*- coding: utf-8 -*-
 import re

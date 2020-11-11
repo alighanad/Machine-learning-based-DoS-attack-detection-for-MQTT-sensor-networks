@@ -15,7 +15,7 @@ def on_message(client, userdata, msg):
     topic = msg.topic
     m_decode=str(msg.payload.decode("utf-8","ignore"))
     print("your room's temperature is: ", m_decode)
-broker ="192.168.1.2"
+broker ="172.20.10.2"
 
 client = mqtt.Client("python1")
 
@@ -29,8 +29,8 @@ client.connect(broker)
 client.loop_start()
 client.subscribe("evohome/room/temp")
 while True:
-    temp = random.randrange(20, 40)
+    temp = random.randrange(17, 25)
     client.publish("evohome/room/temp",temp)
-time.sleep(3)
+    time.sleep(2)
 client.loop_stop()
 client.disconnect()
