@@ -7,6 +7,8 @@ import json
 from time import localtime, strftime, sleep
 
 #parameters
+e_peak_time = 9
+n_peak_time = 11
 hour = datetime.datetime.now()
 my_hour = int(hour.hour)
 states = ["ON","OFF"]
@@ -49,32 +51,31 @@ print("connecting to the broker", broker[0])
 client.connect(broker[0])
 client.loop_start()
 client.subscribe("apartment/room_1/splug_1/state/on")
-event = 200
-times = 1
-lambdas = ((event/times)/3600)
-#JSON
 while True:
     myMsg = {"Room":Rooms[0],
-        "Floors": Floors[0],
-        "Splug": Splug[0], 
+        "Floors": Floors[0], 
+        "Sensor type": "vacuum",
         "Payload":state
-        }
+    }
 
     data_out = json.dumps(myMsg)
-    power = numpy.random.normal(loc=300, scale=100)
-    time.sleep(1/lambdas)
-    if power > 200:
-        myMsg["Payload"] = states[1]
-        data_out = json.dumps(myMsg)
+    my_current = datetime.datetime.now()
+    my_hour = int(my_current.hour)
 
-        client.publish("apartment/room_1/splug_1/state", data_out)
-        time.sleep(1/lambdas)
-        myMsg["Payload"] = states[0]
-        data_out = json.dumps(myMsg)
-
-        client.publish("apartment/room_1/splug_1/state", data_out)
- 
-
+    if e_peak_time < my_hour < n_peak_time:
+        offon=10/3600 #changes from off to on
+        onoff=8/3600 #changes from on to off
+    else:
+        offon=4/3600
+        onoff=2/3600
+    if state==states[1]:
+        client.publish("apartment/room_1/splug_1/state/on", data_out)
+        time.sleep(numpy.random.exponential(1/offon))
+        state=states[0]
+    elif state==states[0]:
+        client.publish("apartment/room_1/splug_1/state/on", data_out)
+        time.sleep(numpy.random.exponential(1/onoff))
+        state=states[1]
     
 client.loop_stop()
 client.disconnect()

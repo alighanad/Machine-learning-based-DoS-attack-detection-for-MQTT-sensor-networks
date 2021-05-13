@@ -9,9 +9,8 @@ from time import localtime, strftime, sleep
 #parameters
 states = ["ON","OFF"]
 state = states[0]
-situation = ["not dirty","dirty","very dirty"]
-dimension = 12
-my_situation = situation[1]
+e_peak_time = 10
+n_peak_time = 11
 Rooms =["Room_1","Room_2","Room_3","Room_4","Room_5","Room_6","Room_7","Room_8","Room_9",
         "Room_10","Room_11","Room_12","Room_13","Room_14",
         "Room_15","Room_16","Room_17","Room_18","Room_19","Room_20","corridor"]
@@ -48,36 +47,30 @@ client.connect(broker[0])
 client.loop_start()
 client.subscribe("apartment/room_1/vacuum/status")
 
-#JSON
-my_dim = 0
-myMsg = {"Room":Rooms[0],
+while True:
+    myMsg = {"Room":Rooms[0],
         "Floors": Floors[0], 
-        "Sensor": "smart vacuum cleaner",
-        "state":state,
+        "Sensor type": "vacuum",
+        "Payload":state
     }
 
-data_out = json.dumps(myMsg)
-
-while my_dim <= dimension:
+    data_out = json.dumps(myMsg)
     my_current = datetime.datetime.now()
     my_hour = int(my_current.hour)
-    my_minute = int(my_current.minute)
-    my_second = int(my_current.second) 
-    if my_hour == 14 and my_minute==45 and my_second==1:
-        myMsg["state"] = states[0]
-        data_out = json.dumps(myMsg)
 
+    if e_peak_time < my_hour < n_peak_time:
+        offon=10/3600 #changes from off to on
+        onoff=8/3600 #changes from on to off
+    else:
+        offon=4/3600
+        onoff=2/3600
+    if state==states[1]:
         client.publish("apartment/room_1/vacuum/status", data_out)
-      
-        while my_dim <= dimension:
-            my_dim+=0.1
-            print(my_dim)
-            time.sleep(1)
-        myMsg["state"] = states[1]
-        data_out = json.dumps(myMsg)
-
+        time.sleep(numpy.random.exponential(1/offon))
+        state=states[0]
+    elif state==states[0]:
         client.publish("apartment/room_1/vacuum/status", data_out)
-    time.sleep(1)
-
+        time.sleep(numpy.random.exponential(1/onoff))
+        state=states[1]
 client.loop_stop()
 client.disconnect()
