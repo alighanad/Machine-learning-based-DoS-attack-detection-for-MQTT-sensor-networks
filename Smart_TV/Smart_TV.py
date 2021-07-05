@@ -11,7 +11,7 @@ hour = datetime.datetime.now()
 my_hour = int(hour.hour)
 states = ["ON","OFF"]
 state = states[0]
-evening_peak_time = 19
+evening_peak_time = 20
 night_peak_time = 24
 Rooms =["Room_1","Room_2","Room_3","Room_4","Room_5","Room_6","Room_7","Room_8","Room_9",
         "Room_10","Room_11","Room_12","Room_13","Room_14",
@@ -47,7 +47,7 @@ client.on_message = on_message
 print("connecting to the broker", broker[0])
 client.connect(broker[0])
 client.loop_start()
-client.subscribe("apartment/room_1/TV/timer/status")
+client.subscribe("apartment/room/TV/status")
 
 #JSON
 
@@ -72,11 +72,11 @@ while True:
         offon=10/3600
         onoff=8/3600
     if state==states[1]:
-        client.publish("apartment/room_1/TV/timer/status", data_out)
+        client.publish("apartment/room/TV/status", data_out)
         time.sleep(numpy.random.exponential(1/offon))
         state=states[0]
     elif state==states[0]:
-        client.publish("apartment/room_1/TV/timer/status", data_out)
+        client.publish("apartment/room/TV/status", data_out)
         time.sleep(numpy.random.exponential(1/onoff))
         state=states[1]
 client.loop_stop()

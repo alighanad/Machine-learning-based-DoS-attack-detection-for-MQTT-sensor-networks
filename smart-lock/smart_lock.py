@@ -7,15 +7,20 @@ import json
 from time import localtime, strftime, sleep
 
 #parameters
-states = ["ON","OFF"]
+e_peak_time = 7
+n_peak_time = 9
+hour = datetime.datetime.now()
+my_hour = int(hour.hour)
+states = ["Locked","unlocked"]
 state = states[0]
-e_peak_time = 9
-n_peak_time = 12
+
 Rooms =["Room_1","Room_2","Room_3","Room_4","Room_5","Room_6","Room_7","Room_8","Room_9",
         "Room_10","Room_11","Room_12","Room_13","Room_14",
         "Room_15","Room_16","Room_17","Room_18","Room_19","Room_20","corridor"]
 
 Floors = ["Floor_1","Floor_2","Floor_3","Floor_4","Floor_5"]
+
+Splug = ["splug_1","splug_2","splug_3","splug_4","splug_5"]
 
 broker =["172.20.10.2","test.mosquitto.org"]
 
@@ -33,9 +38,9 @@ def on_message(client, userdata, msg):
     topic = msg.topic
     m_decode=str(msg.payload.decode("utf-8","ignore"))
     #m_in=json.loads(m_decode) #decode json data
-    print("Smart vacuum cleaner status is: ", m_decode)
+    print("Plug status is: ", m_decode)
 ##MQTT
-client = mqtt.Client("Smart-Roborock")
+client = mqtt.Client("lock-sensor")
 #client.on_log = on_log
 client.on_disconnect = on_disconnect
 client.on_connect = on_connect
@@ -45,12 +50,11 @@ client.on_message = on_message
 print("connecting to the broker", broker[0])
 client.connect(broker[0])
 client.loop_start()
-client.subscribe("apartment/room/vacuum/status")
-
+client.subscribe("apartment/room/lock/state")
 while True:
     myMsg = {"Room":Rooms[0],
         "Floors": Floors[0], 
-        "Sensor type": "vacuum",
+        "Sensor type": "lock",
         "Payload":state
     }
 
@@ -59,18 +63,19 @@ while True:
     my_hour = int(my_current.hour)
 
     if e_peak_time < my_hour < n_peak_time:
-        offon=720/3600 
-        onoff=700/3600 
+        offon=20/3600 #changes from off to on
+        onoff=15/3600 #changes from on to off
     else:
-        offon=4/3600
-        onoff=2/3600
+        offon=10/3600
+        onoff=8/3600
     if state==states[1]:
-        client.publish("apartment/room/vacuum/status", data_out)
+        client.publish("apartment/room/lock/state", data_out)
         time.sleep(numpy.random.exponential(1/offon))
         state=states[0]
     elif state==states[0]:
-        client.publish("apartment/room/vacuum/status", data_out)
+        client.publish("apartment/room/lock/state", data_out)
         time.sleep(numpy.random.exponential(1/onoff))
         state=states[1]
+    
 client.loop_stop()
 client.disconnect()

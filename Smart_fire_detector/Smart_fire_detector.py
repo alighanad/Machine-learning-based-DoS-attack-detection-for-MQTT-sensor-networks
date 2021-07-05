@@ -16,8 +16,8 @@ broker =["172.20.10.2","test.mosquitto.org"]
 
 myMsg = {"Room":Rooms[0],
         "Floors": Floors[0],
-        "Sensor": "Netatmo", 
-        "Payload": "!WARNING!, Smoke Detected"
+        "Sensor": "fire", 
+        "Payload": "Smoke Detected"
         }
 
 data_out = json.dumps(myMsg)
@@ -47,7 +47,7 @@ client.on_message = on_message
 print("connecting to the broker", broker[0])
 client.connect(broker[0])
 client.loop_start()
-client.subscribe("apartment/room_1/Netatmo/status")
+client.subscribe("apartment/room/fire/status")
 
 event = 1
 times = 1
@@ -58,7 +58,7 @@ while True:
     state = numpy.random.randint(0,100)
     if state > 50:
         print(state)
-        client.publish("apartment/room_1/Netatmo/status",data_out )
+        client.publish("apartment/room/fire/status",data_out )
     else:
         continue
 

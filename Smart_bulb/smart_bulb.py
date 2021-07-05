@@ -9,8 +9,8 @@ from time import localtime, strftime, sleep
 #parameters
 hour = datetime.datetime.now()
 my_hour = int(hour.hour)
-evening_peak_time = 10
-night_peak_time = 11
+evening_peak_time = 21
+night_peak_time = 24
 states = ["ON","OFF"]
 state = states[0]
 state_list = [1]
@@ -51,7 +51,7 @@ client.on_message = on_message
 print("connecting to the broker", broker[0])
 client.connect(broker[0])
 client.loop_start()
-client.subscribe("apartment/room_1/bulb_1/state")
+client.subscribe("apartment/room/bulb/state")
 #JSON
 while True:
     myMsg = {"Room":Rooms[0],
@@ -68,14 +68,14 @@ while True:
         offon=500/3600 #changes from off to on
         onoff=480/3600 #changes from on to off
     else:
-        offon=100/3600
-        onoff=120/3600
+        offon=120/3600
+        onoff=100/3600
     if state==states[1]:
-        client.publish("apartment/room_1/bulb_1/state", data_out)
+        client.publish("apartment/room/bulb/state", data_out)
         time.sleep(numpy.random.exponential(1/offon))
         state=states[0]
     elif state==states[0]:
-        client.publish("apartment/room_1/bulb_1/state", data_out)
+        client.publish("apartment/room/bulb/state", data_out)
         time.sleep(numpy.random.exponential(1/onoff))
         state=states[1]
     
